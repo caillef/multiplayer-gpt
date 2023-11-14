@@ -7,6 +7,11 @@ const port = 3000;
 
 app.use(express.json()); // Middleware to parse JSON body
 
+const messages = [
+  'First message',
+  'Second message'
+]
+
 // Swagger set up
 const options = {
   definition: {
@@ -68,7 +73,7 @@ Here's an example of how to adjust your comments:
  *                   example: ["First message", "Second message"]
  * */
 app.get('/messages', (req, res) => {
-  res.json({ messages: ["First message", "Second message"] });
+  res.json({ messages: messages });
 });
 
 // POST /messages route
@@ -111,6 +116,7 @@ app.post('/messages', (req, res) => {
   if (!newMessage) {
     return res.status(400).json({ success: false, message: "No message provided" });
   }
+  messages.push(newMessage)
   // Here you would typically add the message to a database or in-memory storage
   res.json({ success: true, message: newMessage });
 });
