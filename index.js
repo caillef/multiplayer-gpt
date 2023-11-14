@@ -127,6 +127,7 @@ app.post('/messages', authenticateApiKey, (req, res) => {
  * /creatures:
  *   post:
  *     summary: Creates a new creature
+ *     operationId: postCreature
  *     description: Add a new creature with name, description, elements, and an image.
  *     requestBody:
  *       required: true
@@ -176,6 +177,7 @@ app.post('/creatures', upload.single('image'), (req, res) => {
  * /creatures:
  *   get:
  *     summary: Retrieves all creatures
+ *     operationId: getCreatures
  *     description: Get a list of all creatures with their details.
  *     responses:
  *       200:
@@ -215,6 +217,7 @@ app.get('/creatures', (req, res) => {
  * /creatures/{id}:
  *   patch:
  *     summary: Updates a creature's name
+ *     operationId: editCreature
  *     description: Update the name of a creature by its ID.
  *     parameters:
  *       - in: path
