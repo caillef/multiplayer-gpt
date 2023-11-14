@@ -12,6 +12,17 @@ const messages = [
   'Second message'
 ]
 
+const apiKey = 'dcebc6ced15fb919d37b5d1f9eb2dec2';
+
+const authenticateApiKey = (req, res, next) => {
+  const userApiKey = req.get('Authorization');
+  if (userApiKey === apiKey) {
+    next();
+  } else {
+    res.status(401).json({ message: 'Unauthorized: Invalid API key' });
+  }
+};
+
 // Swagger set up
 const options = {
   definition: {
@@ -72,7 +83,7 @@ Here's an example of how to adjust your comments:
  *                     type: string
  *                   example: ["First message", "Second message"]
  * */
-app.get('/messages', (req, res) => {
+app.get('/messages',authenticateApiKey, (req, res) => {
   res.json({ messages: messages });
 });
 
@@ -111,7 +122,7 @@ app.get('/messages', (req, res) => {
  *                 message:
  *                   type: string
  * */
-app.post('/messages', (req, res) => {
+app.post('/messages', authenticateApiKey, (req, res) => {
   const newMessage = req.body.message;
   if (!newMessage) {
     return res.status(400).json({ success: false, message: "No message provided" });
