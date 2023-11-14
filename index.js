@@ -121,6 +121,10 @@ app.post('/messages', (req, res) => {
   res.json({ success: true, message: newMessage });
 });
 
+app.get('/privacy', (req, res) => {
+  res.sendFile(__dirname + '/privacy.html')
+})
+
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
