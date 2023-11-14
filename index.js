@@ -16,6 +16,7 @@ const messages = [
   'First message',
   'Second message'
 ]
+const creatures = []
 
 const apiKey = 'Bearer dcebc6ced1IOEUZHIUQHE5fb919d37b5d1f9eb2dec2';
 
