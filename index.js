@@ -17,6 +17,9 @@ const options = {
       version: '1.0.0',
       description: 'A simple API to get and post messages',
     },
+    servers: {
+      url: "https://multiplayer-gpt.caillef.com/"
+    }
   },
   apis: ['./index.js'], // files containing annotations for the OpenAPI Specification
 };
