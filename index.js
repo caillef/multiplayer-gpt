@@ -2,10 +2,15 @@ const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const yaml = require('js-yaml');
+const multer = require('multer');
+
 const app = express();
 const port = 3000;
 
 app.use(express.json()); // Middleware to parse JSON body
+
+const storage = multer.memoryStorage(); // You can also set this to diskStorage for saving files to disk
+const upload = multer({ storage: storage });
 
 const messages = [
   'First message',
@@ -47,21 +52,6 @@ app.get('/api-docs-raw', (req, res) => {
 });
 
 // GET /messages route
-/**
- The warnings you're encountering are related to some common requirements and best practices in OpenAPI (Swagger) documentation. Let's address these issues:
-
-1. **"In components section, schemas subsection is not an object"**: This error suggests that in your Swagger documentation, under the `components` section, the `schemas` subsection is not properly formatted as an object. The `schemas` subsection should be an object where each schema definition is a property.
-
-2. **"In path /messages, method get is missing operationId; skipping"** and **"In path /messages, method post is missing operationId; skipping"**: The `operationId` is a unique string used to identify an operation. If you don't provide it, some tools may not work correctly or might skip processing these paths.
-
-Here's how you can modify your existing Swagger comments to address these issues:
-
-- Ensure that the `schemas` subsection under `components` is properly formatted.
-- Add `operationId` to each route.
-
-Here's an example of how to adjust your comments:
-
-```javascript
 /**
  * @swagger
  * 
@@ -130,6 +120,143 @@ app.post('/messages', authenticateApiKey, (req, res) => {
   messages.push(newMessage)
   // Here you would typically add the message to a database or in-memory storage
   res.json({ success: true, message: newMessage });
+});
+
+/**
+ * @swagger
+ * /creatures:
+ *   post:
+ *     summary: Creates a new creature
+ *     description: Add a new creature with name, description, elements, and an image.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: The name of the creature.
+ *               description:
+ *                 type: string
+ *                 description: The description of the creature.
+ *               elements:
+ *                 type: string
+ *                 description: Comma-separated elements associated with the creature.
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *                 description: The image of the creature.
+ *     responses:
+ *       201:
+ *         description: New creature created successfully.
+ */
+app.post('/creatures', upload.single('image'), (req, res) => {
+  // Extracting text fields and file
+  const { name, description, elements } = req.body;
+  const image = req.file; // Extracted image
+
+  // Create a new creature object with a unique ID
+  const newCreature = {
+    id: creatures.length + 1,
+    name,
+    description,
+    elements: elements ? elements.split(',') : [], // Assuming elements are sent as a comma-separated string
+    image: image ? { data: image.buffer, contentType: image.mimetype } : null
+  };
+
+  creatures.push(newCreature);
+
+  res.status(201).json(newCreature);
+});
+
+/**
+ * @swagger
+ * /creatures:
+ *   get:
+ *     summary: Retrieves all creatures
+ *     description: Get a list of all creatures with their details.
+ *     responses:
+ *       200:
+ *         description: A list of creatures.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     description: The creature ID.
+ *                   name:
+ *                     type: string
+ *                     description: The name of the creature.
+ *                   description:
+ *                     type: string
+ *                     description: The description of the creature.
+ *                   elements:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *                     description: List of elements associated with the creature.
+ *                   image:
+ *                     type: string
+ *                     format: binary
+ *                     description: The image of the creature.
+ */
+app.get('/creatures', (req, res) => {
+  res.json(creatures);
+});
+
+/**
+ * @swagger
+ * /creatures/{id}:
+ *   patch:
+ *     summary: Updates a creature's name
+ *     description: Update the name of a creature by its ID.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the creature to update.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: The new name of the creature.
+ *     responses:
+ *       200:
+ *         description: Creature name updated successfully.
+ *       404:
+ *         description: Creature not found.
+ */
+app.patch('/creatures/:id', (req, res) => {
+  const { id } = req.params;
+  const { name } = req.body;
+
+  let creatureFound = false;
+  creatures = creatures.map(creature => {
+    if (creature.id == id) {
+      creatureFound = true;
+      return { ...creature, name };
+    }
+    return creature;
+  });
+
+  if (!creatureFound) {
+    return res.status(404).send('Creature not found');
+  }
+
+  res.status(200).send('Creature name updated successfully');
 });
 
 app.get('/privacy', (req, res) => {
