@@ -24,7 +24,7 @@ const options = {
 const openapiSpecification = swaggerJsdoc(options);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification));
 
-app.get('/api-docs/raw', (req, res) => {
+app.get('/api-docs-raw', (req, res) => {
   res.send(yaml.dump(openapiSpecification))
 });
 
