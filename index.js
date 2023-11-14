@@ -12,7 +12,7 @@ const messages = [
   'Second message'
 ]
 
-const apiKey = 'dcebc6ced15fb919d37b5d1f9eb2dec2';
+const apiKey = 'Bearer dcebc6ced1IOEUZHIUQHE5fb919d37b5d1f9eb2dec2';
 
 const authenticateApiKey = (req, res, next) => {
   const userApiKey = req.get('Authorization');
